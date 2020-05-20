@@ -1,0 +1,19 @@
+html {
+    height: 100%;
+}
+
+body {
+    background-color: #fff;
+    overflow: hidden;
+    margin: 0;
+    height: 100%;
+    width: 100%;
+}
+
+.p5Canvas {
+    width: 100% !important;
+    height: auto !important;
+}
+
+
+
