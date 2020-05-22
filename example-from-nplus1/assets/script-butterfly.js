@@ -157,6 +157,7 @@ let mainSketch = function (p) {
   let sliderRho = null;
   let sliderBeta = null;
   let sliderPointsCount = null;
+  let sliderParticlesCount = null;
 
   p.model = null;
 
@@ -193,6 +194,12 @@ let mainSketch = function (p) {
     redrawModel();
   }
 
+  function changeParticlesCountBySlider() {
+    p.particlesCount = sliderParticlesCount.value();
+    redrawModel();
+  }
+
+
   p.setup = function () {
     //p.canvas = p.createCanvas(p.min(p.windowWidth, 700), 500, p.WEBGL);
     p.canvas = p.createCanvas(p.min(p.windowWidth, 1400), 1000, p.WEBGL);
@@ -202,16 +209,19 @@ let mainSketch = function (p) {
     sliderRho = p.createSlider(0.1, 45, p.rho, 0.1);
     sliderBeta = p.createSlider(0.1, 20, p.beta, 0.1);
     sliderPointsCount = p.createSlider(5000, 10000, p.pointsCount, 100);
+    sliderParticlesCount = p.createSlider(0, 200, p.particlesCount, 5);
 
     sliderSigma.position(5, 5);
     sliderRho.position(5, 25);
     sliderBeta.position(5, 45);
     sliderPointsCount.position(5, 65);
+    sliderParticlesCount.position(5, 85);
 
     sliderSigma.input(changeSigmaBySlider);
     sliderRho.input(changeRhoBySlider);
     sliderBeta.input(changeBetaBySlider);
     sliderPointsCount.input(changePointsCountBySlider);
+    sliderParticlesCount.input(changeParticlesCountBySlider);
 
     p.model = new LorenzAttractor(x, y, z, dt, p.sigma, p.rho, p.beta);
     p.points = p.model.drawPoints(p.pointsCount, p.particlesCount);
@@ -249,6 +259,7 @@ let mainSketch = function (p) {
     p.endShape();
 
     p.stroke(255, 102, 1, 200);
+    //p.stroke(0, 0, 0, 100);
     for (let v of p.model.drawParticles()) {
       p.push();
       let coordinates = v.getCoordinates();
