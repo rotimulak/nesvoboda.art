@@ -15,5 +15,16 @@ body {
     height: auto !important;
 }
 
+button{
+    border: 0;
+    background: #ddd;
+    border-radius: 5px;
+    padding: 10px 20px;
+    position: absolute;
+    top: 120px;
+    left: 30px;
+    font-size: 14px;
+}
+
 
 

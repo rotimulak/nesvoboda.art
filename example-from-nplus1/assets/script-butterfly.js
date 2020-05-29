@@ -1,3 +1,6 @@
+let pauseFlag = false;
+
+
 class LorenzAttractor {
   constructor(x, y, z, dt, sigma, rho, beta) {
     this.x = x;
@@ -104,16 +107,24 @@ class LorenzAttractor {
     return points;
   }
 
-  drawParticles() {
+  drawParticles(mouseX, pGlobal) {
     let result = [];
+    let length = this.particles.length;
 
-    for (let i = 0; i < this.particles.length; ++i) {
+    for (let i = 0; i < length; ++i) {
       let p = this.particles[i];
-      p.update(this.getDxDt(p.x, p.y, p.z) * this.dt,
-          this.getDyDt(p.x, p.y, p.z) * this.dt,
-          this.getDzDt(p.x, p.y, p.z) * this.dt);
+      if (!pauseFlag) {
+        p.update(this.getDxDt(p.x, p.y, p.z) * this.dt,
+            this.getDyDt(p.x, p.y, p.z) * this.dt,
+            this.getDzDt(p.x, p.y, p.z) * this.dt);
+      }
+      if (pauseFlag) {
+        length = 5;
+      }
+
       result.push(p);
     }
+
 
     return result;
   }
@@ -151,7 +162,8 @@ let mainSketch = function (p) {
 
   p.pointsCount = 7000;
   p.particlesCount = 50;
-  p.sliderPointsCount = 0;
+  //p.particlesCount = 5;
+  //p.sliderPointsCount = 0; ?
 
   let sliderSigma = null;
   let sliderRho = null;
@@ -166,6 +178,22 @@ let mainSketch = function (p) {
   p.points = [];
 
   p.canvas = null;
+
+
+
+  document.addEventListener("DOMContentLoaded", function(event) {
+    let buttonPause = document.getElementById("button-pause");
+
+    buttonPause.onclick = function(event) {
+      pauseFlag=!pauseFlag;
+      //console.log(p.particlesCount);
+      //p.particlesCount = 5;
+      //redrawModel();
+      //console.log(p.particlesCount);
+    }
+
+  });
+
 
   function redrawModel() {
     p.model.resetCoordinates(x, y, z);
@@ -205,6 +233,9 @@ let mainSketch = function (p) {
     p.canvas = p.createCanvas(p.min(p.windowWidth, 1400), 1000, p.WEBGL);
     p.colorMode(p.RGB);
 
+
+    //canvasHandle();
+
     sliderSigma = p.createSlider(1, 50, p.sigma, 0.1);
     sliderRho = p.createSlider(0.1, 45, p.rho, 0.1);
     sliderBeta = p.createSlider(0.1, 20, p.beta, 0.1);
@@ -240,10 +271,13 @@ let mainSketch = function (p) {
     let rotation = [-0.2480524065198549, -0.1886425467149905, 0.7171889384935938, -0.6233169496259671];
     p.easycam.setDistance(distance, 0);
     p.easycam.setRotation(rotation, 0);
+
   };
+
 
   p.draw = function () {
     p.background(255, 255, 255);
+
 
     p.scale(6);
     p.noFill();
@@ -260,16 +294,45 @@ let mainSketch = function (p) {
 
     p.stroke(255, 102, 1, 200);
     //p.stroke(0, 0, 0, 100);
-    for (let v of p.model.drawParticles()) {
+    for (let v of p.model.drawParticles(p.mouseX, p)) {
       p.push();
       let coordinates = v.getCoordinates();
+      //p.getCurrentPosition();
       p.translate(coordinates[0], coordinates[1], coordinates[2]);
       p.sphere(0.3);
+      //p.torus(5, 2);
       p.pop();
     }
     p.pop();
+
+    //console.log(p.mouseX);
   }
+
+  //p.mousePressed = function () {
+  //
+  //};
+
 };
+
+
+
+
+
+
+//function canvasHandle(){
+//  let canvasEl = document.getElementById('defaultCanvas0');
+//  let lastDownTarget;
+//
+//  canvasEl.addEventListener('mousemove', function(event) {
+//    //console.log("hover");
+//  }, false);
+//
+//}
+
+//window.onload = function() {
+//
+//}
+
 
 
 let fourthP5 = new p5(mainSketch);
