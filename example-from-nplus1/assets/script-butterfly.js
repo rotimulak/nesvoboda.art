@@ -84,7 +84,7 @@ class LorenzAttractor {
     let points = [];
     this.particles.length = 0;
 
-    let particlesStep = pointsCount / particlesCount;
+    let particlesStep = Math.round(pointsCount / particlesCount);
 
     for (let i = 0; i < pointsCount; ++i) {
       this.update();
@@ -93,7 +93,6 @@ class LorenzAttractor {
       let velocity = this.getVelocity(this.x, this.y, this.z);
       this.minVelocity = Math.min(this.minVelocity, velocity);
       this.maxVelocity = Math.max(this.maxVelocity, velocity);
-
 
       if (i % particlesStep === 0) {
         this.particles.push(new Particle(this.x, this.y, this.z));
@@ -107,7 +106,7 @@ class LorenzAttractor {
     return points;
   }
 
-  drawParticles(mouseX, pGlobal) {
+  drawParticles() {
     let result = [];
     let length = this.particles.length;
 
@@ -117,9 +116,6 @@ class LorenzAttractor {
         p.update(this.getDxDt(p.x, p.y, p.z) * this.dt,
             this.getDyDt(p.x, p.y, p.z) * this.dt,
             this.getDzDt(p.x, p.y, p.z) * this.dt);
-      }
-      if (pauseFlag) {
-        length = 5;
       }
 
       result.push(p);
@@ -160,10 +156,11 @@ let mainSketch = function (p) {
   p.rho = 28;
   p.beta = 8 / 3;
 
+  // lines count
   p.pointsCount = 7000;
+  // points count
   p.particlesCount = 50;
-  //p.particlesCount = 5;
-  //p.sliderPointsCount = 0; ?
+
 
   let sliderSigma = null;
   let sliderRho = null;
@@ -179,18 +176,22 @@ let mainSketch = function (p) {
 
   p.canvas = null;
 
-
-
   document.addEventListener("DOMContentLoaded", function(event) {
     let buttonPause = document.getElementById("button-pause");
 
     buttonPause.onclick = function(event) {
       pauseFlag=!pauseFlag;
-      //console.log(p.particlesCount);
-      //p.particlesCount = 5;
-      //redrawModel();
-      //console.log(p.particlesCount);
-    }
+      if (pauseFlag) {
+        p.easycam.removeMouseListeners();
+      }
+      else {
+        p.easycam.attachMouseListeners();
+      }
+
+      // methods for get camera positions are here: https://diwi.github.io/p5.EasyCam/
+      //console.log(p.easycam.getRotation());
+
+    };
 
   });
 
@@ -229,12 +230,8 @@ let mainSketch = function (p) {
 
 
   p.setup = function () {
-    //p.canvas = p.createCanvas(p.min(p.windowWidth, 700), 500, p.WEBGL);
     p.canvas = p.createCanvas(p.min(p.windowWidth, 1400), 1000, p.WEBGL);
     p.colorMode(p.RGB);
-
-
-    //canvasHandle();
 
     sliderSigma = p.createSlider(1, 50, p.sigma, 0.1);
     sliderRho = p.createSlider(0.1, 45, p.rho, 0.1);
@@ -278,13 +275,13 @@ let mainSketch = function (p) {
   p.draw = function () {
     p.background(255, 255, 255);
 
-
     p.scale(6);
     p.noFill();
 
     p.push();
     p.translate(-p.model.centerX, -p.model.centerY, -p.model.centerZ);
 
+    // color of line
     p.stroke(61, 129, 211, 200);
     p.beginShape();
     for (let i = 0; i < p.pointsCount; ++i) {
@@ -292,46 +289,43 @@ let mainSketch = function (p) {
     }
     p.endShape();
 
+    // color of point
     p.stroke(255, 102, 1, 200);
     //p.stroke(0, 0, 0, 100);
-    for (let v of p.model.drawParticles(p.mouseX, p)) {
+    for (let v of p.model.drawParticles()) {
+
       p.push();
       let coordinates = v.getCoordinates();
-      //p.getCurrentPosition();
       p.translate(coordinates[0], coordinates[1], coordinates[2]);
       p.sphere(0.3);
+      // change form of points
       //p.torus(5, 2);
       p.pop();
     }
     p.pop();
-
-    //console.log(p.mouseX);
   }
 
-  //p.mousePressed = function () {
-  //
-  //};
+  p.mousePressed = function () {
+
+    if (pauseFlag) {
+
+      p.loadPixels();
+      let d = p.pixelDensity();
+
+      let r_i = 4 * d *((Math.round(p.mouseY)) * d * p.width + (Math.round(p.mouseX)));
+      let g_i = r_i + 1;
+      let b_i = r_i + 2;
+      let a_i = r_i + 3;
+
+      console.log(p.pixels[r_i] + "  " + p.pixels[g_i] + "  " + p.pixels[b_i]);
+    }
+
+
+  };
 
 };
 
 
-
-
-
-
-//function canvasHandle(){
-//  let canvasEl = document.getElementById('defaultCanvas0');
-//  let lastDownTarget;
-//
-//  canvasEl.addEventListener('mousemove', function(event) {
-//    //console.log("hover");
-//  }, false);
-//
-//}
-
-//window.onload = function() {
-//
-//}
 
 
 
