@@ -1,4 +1,7 @@
 let pauseFlag = false;
+let startGColor = 100;
+//let clickedIndex;
+let clickedIndexes=[];
 
 
 class LorenzAttractor {
@@ -90,6 +93,7 @@ class LorenzAttractor {
       this.update();
       points.push(new p5.Vector(this.x, this.y, this.z));
 
+      // velocity is not used in movement
       let velocity = this.getVelocity(this.x, this.y, this.z);
       this.minVelocity = Math.min(this.minVelocity, velocity);
       this.maxVelocity = Math.max(this.maxVelocity, velocity);
@@ -117,7 +121,6 @@ class LorenzAttractor {
             this.getDyDt(p.x, p.y, p.z) * this.dt,
             this.getDzDt(p.x, p.y, p.z) * this.dt);
       }
-
       result.push(p);
     }
 
@@ -230,7 +233,7 @@ let mainSketch = function (p) {
 
 
   p.setup = function () {
-    p.canvas = p.createCanvas(p.min(p.windowWidth, 1400), 1000, p.WEBGL);
+    p.canvascanvas = p.createCanvas(p.min(p.windowWidth, 1400), p.min(p.windowHeight, 1000), p.WEBGL);
     p.colorMode(p.RGB);
 
     sliderSigma = p.createSlider(1, 50, p.sigma, 0.1);
@@ -291,36 +294,56 @@ let mainSketch = function (p) {
 
     // color of point
     p.stroke(255, 102, 1, 200);
-    //p.stroke(0, 0, 0, 100);
+
+    //console.log(p.model.drawParticles().length);
+
+    let index = 0;
+
     for (let v of p.model.drawParticles()) {
 
       p.push();
       let coordinates = v.getCoordinates();
       p.translate(coordinates[0], coordinates[1], coordinates[2]);
-      p.sphere(0.3);
+      if (clickedIndexes.includes(index)) {
+        //p.stroke(0, 0, 0, 200);
+      }
+      else {
+        p.stroke(255, (startGColor + index), 1, 200);
+        p.sphere(0.3);
+      }
+
+      //p.sphere(0.3);
       // change form of points
       //p.torus(5, 2);
       p.pop();
+
+      index = index + 1;
     }
     p.pop();
   }
 
   p.mousePressed = function () {
-
     if (pauseFlag) {
-
       p.loadPixels();
       let d = p.pixelDensity();
-      // (p.height - p.mouseY) because picture in pixels array is vertically mirrored
-      let r_i = 4 * d *((Math.round(p.height - p.mouseY)) * d * p.width + (Math.round(p.mouseX)));
-      let g_i = r_i + 1;
-      let b_i = r_i + 2;
-      let a_i = r_i + 3;
-
-      console.log(p.pixels[r_i] + "  " + p.pixels[g_i] + "  " + p.pixels[b_i]);
+      if (p.height > p.mouseY) {
+        // (p.height - p.mouseY) is used in formula because picture in pixels array is vertically mirrored
+        let r_i = 4 * d *((Math.round(p.height - p.mouseY)) * d * p.width + (Math.round(p.mouseX)));
+        let g_i = r_i + 1;
+        let b_i = r_i + 2;
+        let a_i = r_i + 3;
+        console.log("rgb of clicked point = " + p.pixels[r_i] + "  " + p.pixels[g_i] + "  " + p.pixels[b_i]);
+        //color of bg - 255, 255, 255
+        //color of line - 61, 129, 211
+        // color of point - 255, [100 + index], 1
+        if (p.pixels[r_i] == 255 && p.pixels[b_i] == 1){
+          let clickedIndex = p.pixels[g_i] - startGColor;
+          console.log("clicked index = " + clickedIndex);
+          clickedIndexes.push(clickedIndex);
+          console.log("array of clicked indexes = " + clickedIndexes);
+        }
+      }
     }
-
-
   };
 
 };
