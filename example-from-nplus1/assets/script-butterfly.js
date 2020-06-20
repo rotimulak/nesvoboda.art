@@ -311,8 +311,8 @@ let mainSketch = function (p) {
 
       p.loadPixels();
       let d = p.pixelDensity();
-
-      let r_i = 4 * d *((Math.round(p.mouseY)) * d * p.width + (Math.round(p.mouseX)));
+      // (p.height - p.mouseY) because picture in pixels array is vertically mirrored
+      let r_i = 4 * d *((Math.round(p.height - p.mouseY)) * d * p.width + (Math.round(p.mouseX)));
       let g_i = r_i + 1;
       let b_i = r_i + 2;
       let a_i = r_i + 3;
