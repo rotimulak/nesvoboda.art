@@ -1,7 +1,10 @@
 let pauseFlag = false;
-let startGColor = 100;
+let startGColorGreen = 31;
+let startGColorBlue = 57;
 //let clickedIndex;
 let clickedIndexes=[];
+// soft-body dynamics
+let organicConstant = 1.0;
 
 
 class LorenzAttractor {
@@ -285,10 +288,10 @@ let mainSketch = function (p) {
     p.translate(-p.model.centerX, -p.model.centerY, -p.model.centerZ);
 
     // color of line
-    p.stroke(61, 129, 211, 200);
+    // p.stroke(61, 129, 211, 200);
     p.beginShape();
     for (let i = 0; i < p.pointsCount; ++i) {
-      p.vertex(p.points[i].x, p.points[i].y, p.points[i].z);
+      // p.vertex(p.points[i].x, p.points[i].y, p.points[i].z);
     }
     p.endShape();
 
@@ -298,9 +301,9 @@ let mainSketch = function (p) {
     //console.log(p.model.drawParticles().length);
 
     let index = 0;
-
+    // let springing = 0.0009, damping = 0.98;
+    // curveTightness(organicConstant);
     for (let v of p.model.drawParticles()) {
-
       p.push();
       let coordinates = v.getCoordinates();
       p.translate(coordinates[0], coordinates[1], coordinates[2]);
@@ -308,8 +311,9 @@ let mainSketch = function (p) {
         //p.stroke(0, 0, 0, 200);
       }
       else {
-        p.stroke(255, (startGColor + index), 1, 200);
-        p.sphere(0.3);
+        p.stroke(0, (startGColorGreen + index), (startGColorBlue - index), 200);
+        // p.sphere(0.3);
+        p.plane(random(10));
       }
 
       //p.sphere(0.3);
